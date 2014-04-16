@@ -1,0 +1,77 @@
+#include "hash.h"
+#include "y.tab.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+void hashInit(void)
+{
+	int i;
+	for (i = 0; i < HASH_SIZE; i++)
+		Table[i] = 0;
+}
+	
+	
+int hashAddress(char *text)
+{
+	int addr = 1;
+	int i;
+	
+	for (i=0; i<strlen(text); i++)
+		addr = (addr*text[i]) % HASH_SIZE + 1;
+	return addr - 1;
+}
+	
+HASH_NODE *hashInsert(char *text, int type)
+{
+     int found = hashFind(text, type);
+	if(!found)
+     {
+	     HASH_NODE *newnode;
+	     newnode = (HASH_NODE*) calloc(1, sizeof(HASH_NODE));
+	     newnode->type = type;
+          newnode->text = (char*) calloc(1, sizeof(strlen(text) + 1));
+	     strcpy(newnode->text,text);
+
+		int address = hashAddress(text);
+		newnode->next = Table[address];
+		Table[address] = newnode;
+		return newnode;
+     }
+     else
+          return found;
+}
+	
+HASH_NODE* hashFind(char *text, int type)
+{
+	//verifica se o CONTEUDO e o TIPO sao iguais
+	HASH_NODE *pt;
+	int addr = hashAddress(text);
+	
+	for(pt = Table[addr]; pt; pt = pt->next)
+		if(!strcmp(pt->text, text) && pt->type == type)
+			return pt;
+		
+	return NULL;
+}
+	
+void hashPrint()
+{
+	int i;
+	HASH_NODE *pt;
+	printf("╔═══════════════════════════════════════════════════════════════════════\n");
+	for(i = 0; i< HASH_SIZE; i++)
+		for(pt = Table[i]; pt; pt = pt->next)
+			switch(pt->type)
+			{
+				case TK_IDENTIFIER:				printf("║ i = %d\t  tipo = IDENTIFICADOR     texto = %s \n", i, pt->text); break;
+				case LIT_INTEGER:				printf("║ i = %d\t  tipo = INTEIRO           texto = %s \n", i, pt->text); break;
+				case LIT_FALSE:					printf("║ i = %d\t  tipo = FALSE             texto = %s \n", i, pt->text); break;
+				case LIT_TRUE:					printf("║ i = %d\t  tipo = TRUE              texto = %s \n", i, pt->text); break;
+				case LIT_CHAR:					printf("║ i = %d\t  tipo = CHAR              texto = %s \n", i, pt->text); break;
+				case LIT_STRING:				printf("║ i = %d\t  tipo = STRING            texto = %s \n", i, pt->text); break;
+				case TOKEN_ERROR:				printf("║ i = %d\t  tipo = ERROR             texto = %s \n", i, pt->text); break;
+				default:						printf("║ DEFAULT  %s \n", pt->text); break;
+			}
+	printf("╚═══════════════════════════════════════════════════════════════════════\n");
+}
