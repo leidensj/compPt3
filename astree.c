@@ -1,8 +1,10 @@
 #include "astree.h"
 #include <stdlib.h>
 #include <stdio.h>
-#define AST_SYMBOL 1
-#define AST_ADD 2
+
+
+
+
 ASTREE* astCreate(int type, HASH_NODE* symbol, ASTREE* s0, ASTREE* s1, ASTREE* s2, ASTREE* s3)
 {
      ASTREE* node;
@@ -34,13 +36,14 @@ void astPrintSingle(ASTREE* node)
 }
 void astPrintTree(ASTREE* root, int level)
 {
+     int i;
+
      if(root == 0)
           return;
 
-     int i;
      for(i=0; i<level;++i)
-          printf("\t");
+          printf("  ");
      astPrintSingle(root);
      for(i = 0; i<MAX_SONS; ++i)
-          astPrintTree(root->son[i]);
+          astPrintTree(root->son[i], level +1);
 }

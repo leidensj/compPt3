@@ -1,13 +1,13 @@
 %{
 #include <stdio.h>
 #include <stdlib.h>
-#include "hash.h"
 #include "astree.h"
+#include "hash.h"
 %}
 
 %union{
 HASH_NODE *symbol;
-ASTREE *asTree;
+ASTREE *astree;
 int number;
 };
 
@@ -46,9 +46,11 @@ int number;
 %left '*' '/'
 %nonassoc '$' '&'
 
-%type <astree> expression
+%type <astree> expression			
 
 %%
+
+
 
 program
 		: global_decl
@@ -83,7 +85,7 @@ init_vec_value
 
 // a funcao eh definida pelo seu tipo, seguido pelo ientificador, parametros e bloco(s)
 function
-		: spec_type TK_IDENTIFIER '(' parameters ')'  blocks ';'
+		: spec_type TK_IDENTIFIER '(' parameters ')'  cmd ';'
 		;
 
 
@@ -96,24 +98,16 @@ spec_type
 
 // lista de parametros da funcao, que pode tambem ser vazia
 parameters    
-		: parameter
-		| parameter ',' parameters
+		: spec_type TK_IDENTIFIER more_parameters
 		| 
 		;
 
-parameter
-		 : spec_type TK_IDENTIFIER
-		 ;
-
-// pode-se ter blocos aninhados
-blocks
-		: cmd
-		| block
-		| block cmds
-		| ';'
+more_parameters
+		: ',' spec_type TK_IDENTIFIER
+		|		 
 		;
 
-// um bloco de comandos entre chaves eh uma sequencia de comandos (talvez vazia) 
+
 block
 		: '{' cmds  '}'
 		;
@@ -124,65 +118,54 @@ cmd
 		: KW_INPUT TK_IDENTIFIER
 		| KW_OUTPUT output
 		| KW_RETURN expression
-		| TK_IDENTIFIER '=' expression { astPrintTree($3); }
-		| flux_control
+		| TK_IDENTIFIER '=' expression  					{ astPrintTree($3,0); }
+		| TK_IDENTIFIER '[' expression ']' '=' expression
+		| KW_IF '(' expression ')' KW_THEN cmd                
+		| KW_IF '(' expression ')' KW_ELSE cmd KW_THEN cmd		   
+		| KW_LOOP cmd '(' expression ')'		   
+		| block
 		;
 
 cmds
-		: cmd
-		| cmd cmds
-		| block cmds
+		: cmd cmds
 		|
 		;
 
 output
-		: out_expression
-		| out_expression ',' output
+		: expression
+		| expression ',' output
 		| LIT_STRING
 		| LIT_STRING ',' output
-		| 
 		;
 
-expressions
-		: expression ',' expressions
-		| expression
-		;
-
-out_expression
- 		: TK_IDENTIFIER                         {$$ = astCreate(AST_SYMBOL,0,0,0,0);}
-		| CONSTANT      
-		| out_expression '+' out_expression 	{ $$ = astCreate(AST_ADD,$1,$3,0,0	)}  
-		| out_expression '*' out_expression		  
-		| out_expression '/' out_expression		  
-		;
-// TEMOS QUE JUNTAR ESSES DOIS GRUPOS DE EXPR, O JOHANN FALOU QUE ASSIM COMO TA VAI DAR MERDA DE REDUCE/REDUCE E SHIFT
-
-// expressoes aritmeticas e/ou logicas (nao entendi direito na especificacao como funciona aqui)
 expression
- 		: out_expression 
-		| '(' expression ')'		  { $$ = 0; }
-		| '!' expression		  
-		| expression OPERATOR_AND expression  { $$ = 0; }
-		| expression OPERATOR_OR expression  { $$ = 0; }
-		| expression OPERATOR_LE expression  { $$ = 0; }
-		| expression OPERATOR_GE expression	 { $$ = 0; }
-		| expression OPERATOR_EQ expression  
-		| expression OPERATOR_NE expression	 
+ 		: TK_IDENTIFIER                         			{$$ = astCreate(AST_SYMBOL,$1,0,0,0,0);}
+		| LIT_INTEGER       								{$$ = astCreate(AST_SYMBOL,$1,0,0,0,0);}
+		| expression '+' expression 						{$$ = astCreate(AST_ADD,0,$1,$3,0,0);}  
+		| expression '-' expression							{$$ = astCreate(AST_SUB,0,$1,$3,0,0);}
+		| expression '*' expression		  					{$$ = astCreate(AST_MUL,0,$1,$3,0,0);}
+		| expression '/' expression							{$$ = astCreate(AST_DIV,0,$1,$3,0,0);}
 		| expression '>' expression
 		| expression '<' expression
-		| TK_IDENTIFIER '[' expression ']' { $$ = 0; }
-		| TK_IDENTIFIER '(' using_parameters ')'  { $$ = 0; }          
+		| '$' TK_IDENTIFIER									{ $$ = 0; }
+		| '&' TK_IDENTIFIER		  							{ $$ = 0; }
+		| '(' expression ')'		  						{ $$ = 0; }
+		| '!' expression		  							{ $$ = 0; }
+		| expression OPERATOR_AND expression  				{ $$ = 0; }
+		| expression OPERATOR_OR expression  				{ $$ = 0; }
+		| expression OPERATOR_LE expression 				{ $$ = 0; }
+		| expression OPERATOR_GE expression	 				{ $$ = 0; }
+		| expression OPERATOR_EQ expression  
+		| expression OPERATOR_NE expression	 
+		| TK_IDENTIFIER '[' expression ']' 					{ $$ = 0; }
+		| TK_IDENTIFIER '(' using_parameters ')'			{ $$ = 0; }          
 		;
 
-flux_control   
-		: KW_IF '(' expressions ')' KW_THEN blocks                
-		| KW_IF '(' expressions ')' KW_ELSE blocks KW_THEN blocks		   
-		| KW_LOOP blocks '(' expressions ')'		   
-		;
-		
+
+
 // definicoes de constantes		
 CONSTANT
-		: LIT_INTEGER        {$$ = astCreate(AST_SYMBOL,0,$1,$3,0,0);}
+		: LIT_INTEGER        
 		| LIT_TRUE
 		| LIT_FALSE    
 		| LIT_CHAR    
@@ -200,8 +183,6 @@ using_parameter
 		 : TK_IDENTIFIER
 		 | CONSTANT
 		 ;
-
-
 
 %%
 

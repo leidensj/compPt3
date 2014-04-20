@@ -1,4 +1,5 @@
 #include "hash.h"
+#include "astree.h"
 #include "y.tab.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -24,7 +25,7 @@ int hashAddress(char *text)
 	
 HASH_NODE *hashInsert(char *text, int type)
 {
-     int found = hashFind(text, type);
+    HASH_NODE *found = hashFind(text, type);
 	if(!found)
      {
 	     HASH_NODE *newnode;

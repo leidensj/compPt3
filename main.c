@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "hash.h"
+#include "astree.h"
 #include "y.tab.h"
 
 int yylex();

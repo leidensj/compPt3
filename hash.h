@@ -1,3 +1,7 @@
+#ifndef HASH_H_
+#define HASH_H_
+
+
 #define HASH_SIZE 997
 
 typedef struct hash_node {
@@ -13,3 +17,6 @@ void hashPrint();
 int hashAddress(char *text);
 HASH_NODE *hashInsert(char *text, int type);
 HASH_NODE *hashFind(char *text, int type);
+
+
+#endif /* !HASH_H_ */
