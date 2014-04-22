@@ -75,6 +75,21 @@ int number;
 %token <symbol> AST_USING_PARAMETERS
 %token <symbol> AST_EXPR_W_TKIDENTIFIER
 %token <symbol> AST_TK_IDENTIFIER_VET
+%token <symbol> AST_USING_PARAMETER_CONST
+%token <symbol> AST_VECTOR_SIZE
+%token <symbol> AST_DECL_VECTOR
+%token <symbol> AST_DECL_VECTOR_INITVALUE
+%token <symbol> AST_DECL
+%token <symbol> AST_DECL_POINTER
+%token <symbol> AST_INIT_VEC_VALUES
+%token <symbol> AST_BLOCK
+%token <symbol> AST_OUTPUT
+%token <symbol> AST_RETURN
+%token <symbol> AST_EQUALS
+%token <symbol> AST_VECTOR_EQUALS
+%token <symbol> AST_FUNCTION_DECL
+%token <symbol> AST_FUNCT_PARAMS
+%token <symbol> AST_FUNCT_MORE_PARAMS
 
 
 %type <astree> expression
@@ -83,7 +98,7 @@ int number;
 %type <astree> spec_type
 %type <astree> decl
 %type <astree> function			
-%type <astree> vector
+%type <astree> vector_size
 %type <astree> init_value
 %type <astree> init_vec_value
 %type <astree> parameters
@@ -110,7 +125,7 @@ int number;
 
 
 program
-		: global_decl												//{root = $1; astPrintTree(root);}
+		: global_decl												{root = $1; astPrintTree(root,0);}
 		;
 	
 
@@ -121,28 +136,28 @@ global_decl
 		;
 
 decl
-		: spec_type TK_IDENTIFIER vector ';'
-		| spec_type TK_IDENTIFIER vector ':' init_vec_value ';'
-		| spec_type TK_IDENTIFIER ':' init_value ';'
-		| spec_type '$' TK_IDENTIFIER ':' init_value ';'
+		: spec_type TK_IDENTIFIER vector_size ';'					{$$ = astCreate(AST_DECL_VECTOR,$2,$1,$3,0,0);}
+		| spec_type TK_IDENTIFIER vector_size ':' init_vec_value ';'{$$ = astCreate(AST_DECL_VECTOR_INITVALUE,$2,$1,$3,$5,0);}
+		| spec_type TK_IDENTIFIER ':' init_value ';'				{$$ = astCreate(AST_DECL,$2,$1,$4,0,0);}
+		| spec_type '$' TK_IDENTIFIER ':' init_value ';'			{$$ = astCreate(AST_DECL_POINTER,$3,$1,$5,0,0);}
 		;
 
-vector
-		: '[' LIT_INTEGER ']'
+vector_size
+		: '[' LIT_INTEGER ']' 										{$$ = astCreate(AST_VECTOR_SIZE,$2,0,0,0,0);}
 		;
 
 init_value
-		: LIT_INTEGER 
+		: LIT_INTEGER 												{$$ = astCreate(AST_LIT_INTEGER,$1,0,0,0,0);} 
 		;
 
 init_vec_value
-		: LIT_INTEGER
-		| LIT_INTEGER init_vec_value
+		: LIT_INTEGER 												{$$ = astCreate(AST_LIT_INTEGER,$1,0,0,0,0);} 
+		| LIT_INTEGER init_vec_value 								{$$ = astCreate(AST_INIT_VEC_VALUES,$1,$2,0,0,0);} 
 		;
 
 // a funcao eh definida pelo seu tipo, seguido pelo ientificador, parametros e bloco(s)
 function
-		: spec_type TK_IDENTIFIER '(' parameters ')'  cmd ';'
+		: spec_type TK_IDENTIFIER '(' parameters ')'  cmd ';' 		{$$ = astCreate(AST_FUNCTION_DECL,$2,$1,$4,$6,0);}
 		;
 
 
@@ -155,31 +170,31 @@ spec_type
 
 // lista de parametros da funcao, que pode tambem ser vazia
 parameters    
-		: spec_type TK_IDENTIFIER more_parameters
+		: spec_type TK_IDENTIFIER more_parameters 					{$$ = astCreate(AST_FUNCT_PARAMS,$2,$1,$3,0,0);}
 		| 															{$$ = 0;}
 		;
 
 more_parameters
-		: ',' spec_type TK_IDENTIFIER
+		: ',' spec_type TK_IDENTIFIER more_parameters 				{$$ = astCreate(AST_FUNCT_MORE_PARAMS,$3,$2,$4,0,0);}
 		|															{$$ = 0;}	 
 		;
 
 
 block
-		: '{' cmds  '}'
+		: '{' cmds  '}'												{$$ = astCreate(AST_BLOCK,0,$2,0,0,0);}			
 		;
 
 
 cmd
 		: KW_INPUT TK_IDENTIFIER									{$$ = astCreate(AST_KW_INPUT,$2,0,0,0,0);}
-		| KW_OUTPUT output
-		| KW_RETURN expression
-		| TK_IDENTIFIER '=' expression  									//{ astPrintTree($3,0); }
-		| TK_IDENTIFIER '[' expression ']' '=' expression
+		| KW_OUTPUT output 											{$$ = astCreate(AST_OUTPUT,0,$2,0,0,0);}
+		| KW_RETURN expression 										{$$ = astCreate(AST_RETURN,0,$2,0,0,0);}
+		| TK_IDENTIFIER '=' expression  							{$$ = astCreate(AST_EQUALS,$1,$3,0,0,0);}
+		| TK_IDENTIFIER '[' expression ']' '=' expression 			{$$ = astCreate(AST_VECTOR_EQUALS,$1,$3,$6,0,0);}
 		| KW_IF '(' expression ')' KW_THEN cmd 						{$$ = astCreate(AST_KW_IF,0,$3,$6,0,0);}                
 		| KW_IF '(' expression ')' KW_ELSE cmd KW_THEN cmd		  	{$$ = astCreate(AST_KW_IF_ELSE,0,$3,$6,$8,0);} 
 		| KW_LOOP cmd '(' expression ')' 							{$$ = astCreate(AST_KW_LOOP,0,$2,$4,0,0);}		   
-		| block
+		| block 													{$$ = $1;}
 		;
 
 cmds
@@ -239,8 +254,8 @@ using_parameters
 		;
 
 using_parameter
-		 : TK_IDENTIFIER
-		 | CONSTANT
+		 : TK_IDENTIFIER 											{$$ = astCreate(AST_SYMBOL,$1,0,0,0,0);}
+		 | CONSTANT 												{$$ = astCreate(AST_USING_PARAMETER_CONST,0,$1,0,0,0);}
 		 ;
 
 %%
