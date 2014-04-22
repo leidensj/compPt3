@@ -2,9 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "astree.h"
-#include "hash.h"
-
-ASTREE *root;
+//#include "hash.h"
 
 %}
 
@@ -36,60 +34,14 @@ int number;
 
 %token TOKEN_ERROR
 
-
+%token <symbol> UNDEFINED   	
 %token <symbol> TK_IDENTIFIER 
 %token <symbol> LIT_INTEGER 
 %token <symbol> LIT_FALSE 
 %token <symbol> LIT_TRUE 
 %token <symbol> LIT_CHAR 
-%token <symbol> LIT_STRING 
-%token <symbol> AST_HIGHER
-%token <symbol> AST_LOWER
-%token <symbol> AST_OPERATOR_AND
-%token <symbol> AST_OPERATOR_OR
-%token <symbol> AST_OPERATOR_LE
-%token <symbol> AST_OPERATOR_GE
-%token <symbol> AST_OPERATOR_EQ
-%token <symbol> AST_OPERATOR_NE
-%token <symbol> AST_NOT
-%token <symbol> AST_GLOBAL_DECL
-%token <symbol> AST_KW_WORD
-%token <symbol> AST_KW_BYTE
-%token <symbol> AST_KW_BOOL
-%token <symbol> AST_LIT_INTEGER
-%token <symbol> AST_LIT_TRUE
-%token <symbol> AST_LIT_FALSE
-%token <symbol> AST_LIT_CHAR
-%token <symbol> AST_LIT_STRING
-%token <symbol> AST_POINTER
-%token <symbol> AST_POINTER_REF
-%token <symbol> AST_EXPR_W_BRACKETS
-%token <symbol> AST_OUTP1
-%token <symbol> AST_OUTP2
-%token <symbol> AST_KW_INPUT
-%token <symbol> AST_KW_IF
-%token <symbol> AST_KW_IF_ELSE
-%token <symbol> AST_KW_LOOP
-%token <symbol> AST_CMDS
-%token <symbol> AST_USING_PRIMARY_PARAMETER
-%token <symbol> AST_USING_PARAMETERS
-%token <symbol> AST_EXPR_W_TKIDENTIFIER
-%token <symbol> AST_TK_IDENTIFIER_VET
-%token <symbol> AST_USING_PARAMETER_CONST
-%token <symbol> AST_VECTOR_SIZE
-%token <symbol> AST_DECL_VECTOR
-%token <symbol> AST_DECL_VECTOR_INITVALUE
-%token <symbol> AST_DECL
-%token <symbol> AST_DECL_POINTER
-%token <symbol> AST_INIT_VEC_VALUES
-%token <symbol> AST_BLOCK
-%token <symbol> AST_OUTPUT
-%token <symbol> AST_RETURN
-%token <symbol> AST_EQUALS
-%token <symbol> AST_VECTOR_EQUALS
-%token <symbol> AST_FUNCTION_DECL
-%token <symbol> AST_FUNCT_PARAMS
-%token <symbol> AST_FUNCT_MORE_PARAMS
+%token <symbol> LIT_STRING
+
 
 
 %type <astree> expression
@@ -125,7 +77,7 @@ int number;
 
 
 program
-		: global_decl												{root = $1; astPrintTree(root,0);}
+		: global_decl												{astPrintTree($1,0);}
 		;
 	
 

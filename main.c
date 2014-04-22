@@ -3,6 +3,7 @@
 #include <string.h>
 #include "hash.h"
 #include "astree.h"
+#include "lex.yy.h"
 #include "y.tab.h"
 
 int yylex();
