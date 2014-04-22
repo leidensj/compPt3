@@ -52,6 +52,15 @@ void astPrintSingle(ASTREE* node)
                printf("RETURN, ");break;
           case AST_FUNCTION_DECL:
                printf("FUNCTIONDECL, ");break;
+          case AST_DECL_VECTOR:
+               printf("VECDECL, ");break;
+          case AST_DECL_VECTOR_INITVALUE:
+               printf("VECDECLINIT, ");break;
+          case AST_DECL:
+               printf("VARDECL, ");break;
+          case AST_DECL_POINTER:
+               printf("DECLPOINTER, ");break;
+
           default: printf("unknown,");break; 
      };
      if (node->symbol != 0)
