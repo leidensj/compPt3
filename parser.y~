@@ -69,7 +69,10 @@ int number;
 %left '*' '/'
 %nonassoc '$' '&'
 
+
 %%
+
+
 
 program
 		: global_decl												{astPrintTree($1,0);}

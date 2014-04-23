@@ -10,7 +10,6 @@ int yylex();
 extern FILE * yyin;
 extern int running;
 extern int getLineNumber(void);
-
 void printTokens()
 {
 	int token = 0;
