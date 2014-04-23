@@ -185,7 +185,7 @@ void astPrintSingle(ASTREE* node)
                astPrintSingle(node->son[1]);
                break;
           case AST_FUNCT_MORE_PARAMS:
-               fprintf(fd, ",");
+               fprintf(fd, ", ");
                astPrintSingle(node->son[0]);
                fprintf(fd, " %s", node->symbol->text);
                astPrintSingle(node->son[1]);

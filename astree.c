@@ -46,7 +46,7 @@ void astPrintSingle(ASTREE* node)
                break;
           case AST_SYMBOL:
                fprintf(fd, "%s", node->symbol->text);
-               break;               
+               break;            
           case AST_ADD:
      		astPrintSingle(node->son[0]);     
 		     fprintf(fd, " + ");

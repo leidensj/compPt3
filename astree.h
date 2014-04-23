@@ -60,8 +60,6 @@
 #define AST_FUNCT_PARAMS 51
 #define AST_FUNCT_MORE_PARAMS 52
 
-
-
 typedef struct astreenode
 {
      int type;
