@@ -57,7 +57,6 @@ int number;
 %type <astree> cmd
 %type <astree> cmds
 %type <astree> output
-%type <astree> string
 %type <astree> CONSTANT
 %type <astree> using_parameters
 %type <astree> using_parameter   
@@ -152,16 +151,15 @@ cmds
 output
 		: expression 												{$$ = astCreate(AST_OUTP1,0,$1,0,0,0);}
 		| expression ',' output 									{$$ = astCreate(AST_OUTP2,0,$1,$3,0,0);}
-		| string 													{$$ = astCreate(AST_OUTP1,0,$1,0,0,0);}
-		| string ',' output 										{$$ = astCreate(AST_OUTP2,0,$1,$3,0,0);}
-		;
-string
-		: LIT_STRING 												{$$ = astCreate(AST_LIT_STRING,$1,0,0,0,0);}
 		;
 
 expression
  		: TK_IDENTIFIER                         					{$$ = astCreate(AST_SYMBOL,$1,0,0,0,0);}
-		| LIT_INTEGER       										{$$ = astCreate(AST_SYMBOL,$1,0,0,0,0);}
+		| LIT_INTEGER        										{$$ = astCreate(AST_LIT_INTEGER,$1,0,0,0,0);}
+		| LIT_TRUE													{$$ = astCreate(AST_LIT_TRUE,$1,0,0,0,0);}
+		| LIT_FALSE    												{$$ = astCreate(AST_LIT_FALSE,$1,0,0,0,0);}
+		| LIT_CHAR    												{$$ = astCreate(AST_LIT_CHAR,$1,0,0,0,0);}
+		| LIT_STRING												{$$ = astCreate(AST_LIT_STRING,$1,0,0,0,0);}
 		| expression '+' expression 								{$$ = astCreate(AST_ADD,0,$1,$3,0,0);}  
 		| expression '-' expression									{$$ = astCreate(AST_SUB,0,$1,$3,0,0);}
 		| expression '*' expression		  							{$$ = astCreate(AST_MUL,0,$1,$3,0,0);}

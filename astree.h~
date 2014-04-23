@@ -59,6 +59,7 @@
 #define AST_VECTOR_EQUALS 50
 #define AST_FUNCT_PARAMS 51
 #define AST_FUNCT_MORE_PARAMS 52
+#define AST_CONSTANT 53
 
 
 
@@ -73,7 +74,7 @@ typedef struct astreenode
 ASTREE* astCreate(int type, HASH_NODE* symbol, ASTREE* s0, ASTREE* s1, ASTREE* s2, ASTREE* s3);
 void astPrintSingle(ASTREE* node);
 void astPrintTree(ASTREE* root, int level);
-void void astGetOutputFileName(char *fn);
+void astGetOutputFileName(char *fn);
 
 
 
