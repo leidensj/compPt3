@@ -21,7 +21,7 @@ void astPrintSingle(ASTREE* node)
 {
      if(node == 0)
           return;
-     printf("\nASTREE(");
+     printf("ASTREE(");
      switch(node->type)
      {
           case AST_GLOBAL_DECL:
